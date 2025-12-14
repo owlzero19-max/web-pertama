@@ -2,7 +2,7 @@
 const DATA = {
 	huruf: Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 	hewan: {
-		A:{name:'Ayam', emoji:'🐔'}, B:{name:'Beruang', emoji:'🐻'}, C:{name:'Cicak', emoji:'🦎'}, D:{name:'Domba', emoji:'🐑'},
+		A:{name:'Ayam', emoji:'🐔'}, B:{name:'Bebek', emoji:'🦆'}, C:{name:'Cicak', emoji:'🦎'}, D:{name:'Domba', emoji:'🐑'},
 		E:{name:'Elang', emoji:'🦅'}, F:{name:'Flamingo', emoji:'🦩'}, G:{name:'Gajah', emoji:'🐘'}, H:{name:'Harimau', emoji:'🐯'},
 		I:{name:'Ikan', emoji:'🐟'}, J:{name:'Jerapah', emoji:'🦒'}, K:{name:'Kucing', emoji:'🐱'}, L:{name:'Lumba-lumba', emoji:'🐬'},
 		M:{name:'Monyet', emoji:'🐵'}, N:{name:'Nuri', emoji:'🦜'}, O:{name:'Orangutan', emoji:'🦧'}, P:{name:'Panda', emoji:'🐼'},
@@ -11,18 +11,18 @@ const DATA = {
 		Y:{name:'Yak', emoji:'🐂'}, Z:{name:'Zebra', emoji:'🦓'}
 	},
 	warna: [
-		{name:'Merah', code:'#ef476f'}, {name:'Kuning', code:'#ffd166'}, {name:'Biru', code:'#118ab2'},
-		{name:'Hijau', code:'#06d6a0'}, {name:'Ungu', code:'#9d4edd'}, {name:'Oranye', code:'#ff7a59'},
-		{name:'Pink', code:'#ff6bcb'}, {name:'Cokelat', code:'#8d6e63'}, {name:'Abu-abu', code:'#6c757d'},
-		{name:'Hitam', code:'#343a40'}, {name:'Putih', code:'#ffffff'}, {name:'Tosca', code:'#2ec4b6'}, {name:'Magenta', code:'#d62828'}
+		{name:'Merah', code:'#ff0000ff'}, {name:'Kuning', code:'#ffcc3eff'}, {name:'Biru', code:'#0065d8ff'},
+		{name:'Hijau', code:'#06af00ff'}, {name:'Ungu', code:'#8200ecff'}, {name:'Oranye', code:'#ff6600ff'},
+		{name:'Pink', code:'#ff00b3ff'}, {name:'Cokelat', code:'#9c563dff'}, {name:'Abu-abu', code:'#5e6469ff'},
+		{name:'Hitam', code:'#000000ff'}, {name:'Putih', code:'#ffffff'}
 	],
 	bentuk: [
 		{name:'Lingkaran', shape:'circle', emoji:'⚫'}, {name:'Segitiga', shape:'triangle', emoji:'🔺'},
 		{name:'Persegi', shape:'square', emoji:'◻️'}, {name:'Bintang', shape:'star', emoji:'⭐'},
 		{name:'Hati', shape:'heart', emoji:'❤️'}, {name:'Belah Ketupat', shape:'diamond', emoji:'🔷'},
-		{name:'Bulan', shape:'crescent', emoji:'🌙'}, {name:'Segilima', shape:'pentagon', emoji:'⬟'},
-		{name:'Segienam', shape:'hexagon', emoji:'⬢'}
+		{name:'Bulan', shape:'crescent', emoji:'🌙'}
 	]
+	,angka: [1,2,3,4,5,6,7,8,9,10]
 };
 
 // DOM
@@ -58,7 +58,9 @@ function playCorrect(){ ensureAudio(); // cheerful chord
 	if(audioElements.correct){ audioElements.correct.currentTime = 0; audioElements.correct.play().catch(()=>{}); return; }
 	const now = audioCtx.currentTime; const o1=audioCtx.createOscillator(), o2=audioCtx.createOscillator(), g=audioCtx.createGain(); o1.type='sine'; o2.type='sine'; o1.frequency.value=440; o2.frequency.value=660; g.gain.value=0.12; o1.connect(g); o2.connect(g); g.connect(audioCtx.destination); o1.start(now); o2.start(now); g.gain.exponentialRampToValueAtTime(0.0001, now+0.6); o1.stop(now+0.6); o2.stop(now+0.6);
 }
-function playWrong(){ ensureAudio(); const now=audioCtx.currentTime; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.value=160; g.gain.value=0.18; o.connect(g); g.connect(audioCtx.destination); o.start(now); g.gain.exponentialRampToValueAtTime(0.0001, now+0.35); o.stop(now+0.35); }
+function playWrong(){ ensureAudio(); // If user uploaded a 'wrong' audio file, play it
+	if(audioElements.wrong){ audioElements.wrong.currentTime = 0; audioElements.wrong.play().catch(()=>{}); return; }
+	const now=audioCtx.currentTime; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.value=160; g.gain.value=0.18; o.connect(g); g.connect(audioCtx.destination); o.start(now); g.gain.exponentialRampToValueAtTime(0.0001, now+0.35); o.stop(now+0.35); }
 
 // Speech (Indonesian female-cheerful preference)
 function initVoices(){
@@ -93,6 +95,14 @@ function renderLearn(){ const m = materialSelect.value; learnTitle.textContent =
 	} else if(m==='bentuk'){
 		DATA.bentuk.forEach(s=>{ const node = cardTpl.content.cloneNode(true); node.querySelector('.big').textContent = s.emoji; node.querySelector('.label').textContent = s.name; node.querySelector('.card').addEventListener('click', ()=>{ speak(s.name); showModal(s.name, s.emoji); }); learnContent.appendChild(node); });
 	}
+	else if(m==='angka'){
+		DATA.angka.forEach(n=>{ const node = cardTpl.content.cloneNode(true); node.querySelector('.big').textContent = n; node.querySelector('.label').textContent = `Angka ${n}`; node.querySelector('.card').addEventListener('click', ()=>{ speak(String(n)); showModal(`Angka ${n}`, n); }); learnContent.appendChild(node); });
+	}
+}
+
+// Support 'angka' in learn view
+if(typeof(DATA.angka)!=='undefined'){
+    // nothing needed here — renderLearn will read DATA when select changes
 }
 
 materialSelect.addEventListener('change', ()=>{ renderLearn(); renderPlayTitle(); });
@@ -108,7 +118,12 @@ modal.addEventListener('click', e=>{ if(e.target===modal) closeModalBtn.click();
 function startGame(){ score = 0; updateScore(); startBtn.textContent='Mulai lagi'; nextQuestion(); }
 function updateScore(){ scoreEl.textContent = score; }
 
-function nextQuestion(){ const m = materialSelect.value; if(m==='huruf') questionLetter(); else if(m==='hewan') questionAnimal(); else if(m==='warna') questionColor(); else if(m==='bentuk') questionShape(); }
+function nextQuestion(){ const m = materialSelect.value; if(m==='huruf') questionLetter(); else if(m==='hewan') questionAnimal(); else if(m==='warna') questionColor(); else if(m==='bentuk') questionShape(); else if(m==='angka') questionNumber(); }
+// include angka
+function questionNumber(){ const nums = DATA.angka; const correct = nums[Math.floor(Math.random()*nums.length)]; current={type:'angka', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:48px;font-weight:900">Pilih angka:</div><div style="font-size:64px">${correct}</div>`; playContent.appendChild(prompt);
+	const others = shuffle(nums.filter(n=>n!==correct)).slice(0,2);
+	const opts = shuffle([correct,...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(o=>{ const b=document.createElement('button'); b.className='choice'; b.innerHTML=`<div class="emoji" style="font-size:44px">${o}</div><div class="name">${o}</div>`; b.addEventListener('click', ()=> handleAnswer(o===correct)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Angka ${correct}`);
+}
 
 function shuffle(a){ return a.slice().sort(()=>0.5-Math.random()); }
 
@@ -135,7 +150,19 @@ function questionShape(){ const items = DATA.bentuk; const correct = items[Math.
 	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.innerHTML=`<div style="font-size:44px">${s.emoji}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Bentuk ${correct.name}`);
 }
 
-function handleAnswer(isCorrect){ if(isCorrect){ score += 10; playCorrect(); speak('Benar!'); } else { score = Math.max(0, score-5); playWrong(); speak('Salah, coba lagi'); } updateScore(); setTimeout(()=> nextQuestion(), 800); }
+function getCorrectAnswerText(){ if(!current) return '';
+	if(current.type==='huruf') return current.correct;
+	if(current.type==='hewan') return DATA.hewan[current.correctKey].name;
+	if(current.type==='warna') return current.correct.name;
+	if(current.type==='bentuk') return current.correct.name;
+	if(current.type==='angka') return String(current.correct);
+	return '';
+}
+
+function showCorrectNote(text){ const note = document.createElement('div'); note.className='correct-note'; note.textContent = `Jawaban benar: ${text}`; playContent.appendChild(note); setTimeout(()=> note.remove(), 1200); }
+
+function handleAnswer(isCorrect){ if(isCorrect){ score += 10; playCorrect(); if(!audioElements.correct) speak('Benar!'); } else { score = Math.max(0, score-5); playWrong(); if(!audioElements.wrong) speak('Salah, coba lagi'); const correctText = getCorrectAnswerText(); // announce correct answer after short delay
+		setTimeout(()=> speak(`Yang benar adalah ${correctText}`), 400); showCorrectNote(correctText); } updateScore(); setTimeout(()=> nextQuestion(), 1200); }
 
 startBtn.addEventListener('click', ()=>{ // resume audio on user gesture
 	if(!audioCtx) ensureAudio(); startGame(); });
