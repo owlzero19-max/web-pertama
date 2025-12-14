@@ -27,14 +27,12 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
 .btn{background:#eee;border:0;padding:8px 12px;border-radius:10px;cursor:pointer}
 .btn.primary{background:var(--accent);color:white;padding:10px 14px;font-weight:700}
 .play-content{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
-.correct-note{background:#fff9c4;border-radius:10px;padding:10px 12px;color:#5a4a00;font-weight:800;box-shadow:0 6px 14px rgba(0,0,0,.06);margin-top:8px}
-
-@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-6px)}100%{transform:translateX(0)}}
-.choice.shake{animation:shake .5s}
-.choice.correct{outline:4px solid #6bdc9e}
 .choice-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .choice{background:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.06);cursor:pointer;min-width:120px;text-align:center}
 .choice .emoji{font-size:48px}
+.choice.correct{outline:4px solid #28a745;background:linear-gradient(180deg,#e8fff0,#ffffff)}
+.choice.wrong{outline:4px solid #dc3545;opacity:.9;background:linear-gradient(180deg,#fff0f0,#ffffff)}
+.choice:disabled{opacity:.6;pointer-events:none}
 .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .18s}
 .modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
 .modal-content{background:var(--card);padding:18px;border-radius:16px;max-width:420px;width:100%;position:relative}
