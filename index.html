@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Belajar Anak — Hewan, Warna, Bentuk, Huruf</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header class="site-header">
+		<div class="brand">Belajar Ceria</div>
+		<nav class="topnav" role="navigation" aria-label="Navigasi utama">
+			<button class="nav-btn active" data-view="learn">Belajar</button>
+			<button class="nav-btn" data-view="play">Main</button>
+			<div class="spacer"></div>
+			<label class="select-label">Materi:
+				<select id="materialSelect">
+					<option value="huruf">Huruf</option>
+					<option value="hewan">Hewan</option>
+					<option value="warna">Warna</option>
+					<option value="bentuk">Bentuk</option>
+				</select>
+			</label>
+		</nav>
+	</header>
+
+	<main class="container">
+		<section id="learnView" class="panel view">
+			<h2 id="learnTitle">Belajar: Huruf</h2>
+			<div id="learnContent" class="learn-content"></div>
+		</section>
+
+		<section id="playView" class="panel view hidden">
+			<h2 id="playTitle">Main: Huruf</h2>
+			<div class="game-controls">
+				<button id="startBtn" class="btn primary">Mulai</button>
+				<div class="score">Skor: <span id="score">0</span></div>
+			</div>
+			<div class="audio-upload">
+				<label>Unggah audio suara wanita (opsional):</label>
+				<div class="upload-row">
+					<input type="file" id="audioInstrFile" accept="audio/*">
+					<input type="file" id="audioCorrectFile" accept="audio/*">
+					<input type="file" id="audioWrongFile" accept="audio/*">
+				</div>
+				<div class="upload-note">Jika tidak diunggah, aplikasi akan menggunakan suara TTS Bahasa Indonesia.</div>
+			</div>
+			<div id="playContent" class="play-content" aria-live="polite"></div>
+		</section>
+	</main>
+
+	<div id="modal" class="modal" role="dialog" aria-hidden="true">
+		<div class="modal-content">
+			<button id="closeModal" class="modal-close" aria-label="Tutup">✕</button>
+			<div id="modalBody"></div>
+			<div class="modal-actions">
+				<button id="playSpeech" class="btn">Putar suara</button>
+			</div>
+		</div>
+	</div>
+
+	<footer class="site-footer">Dirancang untuk anak usia 3–5 tahun • Suara: Bahasa Indonesia</footer>
+
+	<template id="cardTpl">
+		<div class="card">
+			<div class="big"></div>
+			<div class="label"></div>
+		</div>
+	</template>
+
+	<script src="script.js" defer></script>
+</body>
+</html>

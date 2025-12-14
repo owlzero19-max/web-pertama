@@ -1,0 +1,43 @@
+:root{
+	--bg:#fffaf2;
+	--card:#ffffff;
+	--accent:#ff7a59;
+	--accent-2:#ffd166;
+	--muted:#6b6b6b;
+	--radius:14px;
+	--shadow: 0 8px 20px rgba(34,34,34,.08);
+}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0; background:var(--bg); color:#223}
+.site-header{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+.brand{font-weight:800;font-size:18px}
+.topnav{display:flex;align-items:center;gap:8px;width:100%}
+.nav-btn{background:transparent;border:0;color:inherit;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:700}
+.nav-btn.active{background:rgba(255,255,255,.12)}
+.spacer{flex:1}
+.select-label{font-weight:700}
+.container{max-width:1100px;margin:18px auto;padding:12px;display:flex;gap:16px;flex-direction:column}
+.panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.hidden{display:none}
+.learn-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.card{background:linear-gradient(180deg,#fff,#fffef0);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid #ffd9c9;cursor:pointer}
+.card .big{font-size:56px}
+.card .label{font-weight:800}
+.game-controls{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.btn{background:#eee;border:0;padding:8px 12px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--accent);color:white;padding:10px 14px;font-weight:700}
+.play-content{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.choice-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.choice{background:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.06);cursor:pointer;min-width:120px;text-align:center}
+.choice .emoji{font-size:48px}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .18s}
+.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.modal-content{background:var(--card);padding:18px;border-radius:16px;max-width:420px;width:100%;position:relative}
+.modal-close{position:absolute;right:10px;top:8px;background:transparent;border:0;font-size:20px;cursor:pointer}
+.modal-actions{display:flex;justify-content:center;margin-top:8px}
+.site-footer{text-align:center;padding:14px;color:var(--muted)}
+
+/* Confetti */
+.confetti-piece{position:fixed;pointer-events:none;left:0;right:0;top:0}
+
+@media (max-width:720px){.learn-content{grid-template-columns:repeat(2,1fr)}.card .big{font-size:44px}}
