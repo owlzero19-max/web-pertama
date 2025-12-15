@@ -50,15 +50,19 @@ let audioCtx = null;
 let score = 0;
 let current = null;
 let speechVoice = null;
+let uploadedAudio = {};
+let audioElements = {};
 // No upload files — using SpeechSynthesis TTS only
 
 // Audio helpers
 function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
 function playTone(freqs, type='sine', duration=0.25){ ensureAudio(); const t=audioCtx.currentTime; freqs.forEach(f=>{ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type=type; o.frequency.value=f; g.gain.value=0.08; o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+duration); }); }
 function playCorrect(){ ensureAudio(); const now = audioCtx.currentTime; const o1=audioCtx.createOscillator(), o2=audioCtx.createOscillator(), g=audioCtx.createGain(); o1.type='sine'; o2.type='sine'; o1.frequency.value=660; o2.frequency.value=880; g.gain.value=0.12; o1.connect(g); o2.connect(g); g.connect(audioCtx.destination); o1.start(now); o2.start(now); g.gain.exponentialRampToValueAtTime(0.0001, now+0.6); o1.stop(now+0.6); o2.stop(now+0.6); }
+function playCorrectAsync(){ playCorrect(); return new Promise(res=> setTimeout(res, 700)); }
 
 // play wrong audio file if uploaded
 function playWrong(){ ensureAudio(); const now=audioCtx.currentTime; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.value=160; g.gain.value=0.18; o.connect(g); g.connect(audioCtx.destination); o.start(now); g.gain.exponentialRampToValueAtTime(0.0001, now+0.35); o.stop(now+0.35); }
+function playWrongAsync(){ playWrong(); return new Promise(res=> setTimeout(res, 420)); }
 
 // Speech (Indonesian female-cheerful preference)
 function initVoices(){
@@ -76,6 +80,7 @@ function initVoices(){
 	speechVoice = byLangIdAndFemale || byLangId || byFemaleName || voices[0];
 }
 function speak(text){ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='id-ID'; if(speechVoice) u.voice = speechVoice; u.rate=0.95; u.pitch=1.45; speechSynthesis.speak(u); }
+function speakAsync(text){ return new Promise(resolve=>{ if(!('speechSynthesis' in window)){ resolve(); return; } speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='id-ID'; if(speechVoice) u.voice = speechVoice; u.rate=0.95; u.pitch=1.45; u.onend = resolve; u.onerror = resolve; speechSynthesis.speak(u); }); }
 window.speechSynthesis.onvoiceschanged = initVoices;
 
 // Navigation
@@ -119,24 +124,20 @@ function questionLetter(){ const letters = DATA.huruf; const correct = letters[M
 	playContent.innerHTML=''; const prompt = document.createElement('div'); prompt.innerHTML=`<div style="font-size:48px;font-weight:900">Pilih huruf:</div><div style="font-size:64px">${correct}</div>`; playContent.appendChild(prompt);
 	// ensure correct is included
 	const others = shuffle(letters.filter(l=>l!==correct)).slice(0,2);
-	const choices = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; choices.forEach(ch=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = ch; if(ch===correct) b.dataset.correct='true'; b.innerHTML=`<div class="emoji" style="font-size:44px">${ch}</div><div class="name">${ch}</div>`; b.addEventListener('click', ()=> handleAnswer(ch===correct, b)); grid.appendChild(b); }); playContent.appendChild(grid); speak(`Huruf ${correct}`);
+	const choices = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; choices.forEach(ch=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = ch; if(ch===correct) b.dataset.correct='true'; b.innerHTML=`<div class="emoji" style="font-size:44px">${ch}</div><div class="name">${ch}</div>`; b.addEventListener('click', ()=> handleAnswer(ch===correct, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Huruf ${correct}`);
 }
 
-function questionAnimal(){ const keys = Object.keys(DATA.hewan); const correctKey = keys[Math.floor(Math.random()*keys.length)]; const correct = DATA.hewan[correctKey]; current={type:'hewan', correctKey}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih binatang: <div style="font-size:28px">${correct.name}</div></div>`; playContent.appendChild(prompt);
+function questionAnimal(){ const animals = DATA.hewan; const idx = Math.floor(Math.random()*animals.length); const correctAnimal = animals[idx]; current = {type:'hewan', correct: correctAnimal}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih binatang: <div style="font-size:28px">${correctAnimal.name}</div></div>`; playContent.appendChild(prompt);
 	// options: pick correct animal and two others from array
-	const animals = DATA.hewan;
-	const idx = Math.floor(Math.random()*animals.length);
-	const correctAnimal = animals[idx];
-	current = {type:'hewan', correct: correctAnimal};
 	const others = shuffle(animals.filter((_,i)=>i!==idx)).slice(0,2);
 	const opts = shuffle([correctAnimal, ...others]);
-	const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(a=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = a.name; if(a.name===correctAnimal.name) b.dataset.correct='true'; b.innerHTML=`<div class="emoji">${a.emoji}</div><div class="name">${a.name}</div>`; b.addEventListener('click', ()=> handleAnswer(a.name===correctAnimal.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); speak(`Pilih binatang ${correctAnimal.name}`);
+	const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(a=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = a.name; if(a.name===correctAnimal.name) b.dataset.correct='true'; b.innerHTML=`<div class="emoji">${a.emoji}</div><div class="name">${a.name}</div>`; b.addEventListener('click', ()=> handleAnswer(a.name===correctAnimal.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Pilih binatang ${correctAnimal.name}`);
 }
 
 function questionColor(){ const items = DATA.warna; const correct = items[Math.floor(Math.random()*items.length)]; current={type:'warna', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih warna: <div style="font-size:28px">${correct.name}</div></div>`; playContent.appendChild(prompt);
 	// ensure correct included
 	const others = shuffle(items.filter(i=>i.name!==correct.name)).slice(0,2);
-	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(c=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = c.name; if(c.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${c.code}"></div><div class="name">${c.name}</div>`; b.addEventListener('click', ()=> handleAnswer(c.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); speak(`Warna ${correct.name}`);
+	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(c=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = c.name; if(c.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${c.code}"></div><div class="name">${c.name}</div>`; b.addEventListener('click', ()=> handleAnswer(c.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Warna ${correct.name}`);
 }
 
 function questionShape(){ const items = DATA.bentuk; const correct = items[Math.floor(Math.random()*items.length)]; current={type:'bentuk', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih bentuk: <div style="font-size:28px">${correct.name}</div></div>`; playContent.appendChild(prompt);
@@ -149,39 +150,41 @@ function questionNumber(){ const items = DATA.angka; const correct = items[Math.
 	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = s.name; if(s.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="font-size:44px">${s.num}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Angka ${correct.name}`);
 }
 
-function handleAnswer(isCorrect, button){
+async function handleAnswer(isCorrect, button){
 	// disable all choices to avoid double clicks
 	const choices = playContent.querySelectorAll('.choice');
 	choices.forEach(b=> b.disabled = true);
+	// stop any instruction or other uploaded audio and cancel TTS to avoid overlap
+	if(audioElements){ Object.values(audioElements).forEach(a=>{ try{ if(a && !a.paused){ a.pause(); a.currentTime = 0; } }catch(e){} }); }
+	speechSynthesis.cancel();
 
 	if(isCorrect){
-		score += 10; updateScore(); playCorrect(); if(button) button.classList.add('correct');
-		if(!audioElements.correct) speak('Benar!');
-		setTimeout(()=>{
-			if(button) button.classList.remove('correct');
-			nextQuestion();
-		}, 1200);
+		score += 10; updateScore(); if(button) button.classList.add('correct');
+		const toneP = playCorrectAsync();
+		const speechP = (audioElements.correct ? playAudioElementAsync('correct','Benar!') : speakAsync('Benar!'));
+		await Promise.all([toneP, speechP]);
+		if(button) button.classList.remove('correct');
+		nextQuestion();
 	} else {
-		score = Math.max(0, score-5); updateScore(); playWrong();
+		score = Math.max(0, score-5); updateScore(); const toneP = playWrongAsync();
 		// tell the correct answer
 		let correctText = '';
 		if(current.type === 'huruf') correctText = current.correct;
-		else if(current.type === 'hewan') correctText = DATA.hewan[current.correctKey].name;
+		else if(current.type === 'hewan') correctText = current.correct.name;
 		else if(current.type === 'warna') correctText = current.correct.name;
 		else if(current.type === 'bentuk') correctText = current.correct.name;
 		else if(current.type === 'angka') correctText = current.correct.name;
-		speak(`Salah. Jawabannya adalah ${correctText}`);
+		const speechP = playAudioElementAsync('wrong', `Salah. Jawabannya adalah ${correctText}`);
 
 		// visually indicate correct and wrong
 		const correctBtn = Array.from(choices).find(b=> b.dataset && b.dataset.correct === 'true');
 		if(correctBtn) correctBtn.classList.add('correct');
 		if(button) button.classList.add('wrong');
 
-		setTimeout(()=>{
-			if(correctBtn) correctBtn.classList.remove('correct');
-			if(button) button.classList.remove('wrong');
-			nextQuestion();
-		}, 2000);
+		await Promise.all([toneP, speechP]);
+		if(correctBtn) correctBtn.classList.remove('correct');
+		if(button) button.classList.remove('wrong');
+		nextQuestion();
 	}
 }
 
@@ -207,7 +210,12 @@ loadFileToAudio(correctInput,'correct');
 loadFileToAudio(wrongInput,'wrong');
 
 // prefer playing uploaded instruction audio in play routines
-function playInstructionAudio(fallbackText){ if(audioElements.instr){ audioElements.instr.currentTime = 0; audioElements.instr.play().catch(()=> speak(fallbackText)); } else speak(fallbackText); }
+function playInstructionAudio(fallbackText){ // returns a Promise that resolves when either uploaded audio ends or TTS finishes
+    if(audioElements.instr){ const a = audioElements.instr; try{ a.currentTime = 0; const p = a.play(); return new Promise(resolve=>{ a.addEventListener('ended', ()=> resolve(), {once:true}); p.catch(()=> speakAsync(fallbackText).then(resolve)); }); } catch(e){ return speakAsync(fallbackText); } }
+    return speakAsync(fallbackText);
+}
+
+function playAudioElementAsync(key, fallbackText){ if(audioElements[key]){ const a = audioElements[key]; try{ a.currentTime = 0; const p = a.play(); return new Promise(resolve=>{ a.addEventListener('ended', ()=> resolve(), {once:true}); p.catch(()=> speakAsync(fallbackText).then(resolve)); }); } catch(e){ return speakAsync(fallbackText); } } return speakAsync(fallbackText); }
 
 // Update question routines to use playInstructionAudio where appropriate
 // (example: in questionAnimal we already call speak(); replace with playInstructionAudio to prefer uploaded audio)
