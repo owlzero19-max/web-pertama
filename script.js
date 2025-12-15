@@ -124,30 +124,40 @@ function questionLetter(){ const letters = DATA.huruf; const correct = letters[M
 	playContent.innerHTML=''; const prompt = document.createElement('div'); prompt.innerHTML=`<div style="font-size:48px;font-weight:900">Pilih huruf:</div><div style="font-size:64px">${correct}</div>`; playContent.appendChild(prompt);
 	// ensure correct is included
 	const others = shuffle(letters.filter(l=>l!==correct)).slice(0,2);
-	const choices = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; choices.forEach(ch=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = ch; if(ch===correct) b.dataset.correct='true'; b.innerHTML=`<div class="emoji" style="font-size:44px">${ch}</div><div class="name">${ch}</div>`; b.addEventListener('click', ()=> handleAnswer(ch===correct, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Huruf ${correct}`);
+	const choices = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; choices.forEach(ch=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = ch; if(ch===correct) b.dataset.correct='true'; b.innerHTML=`<div class="emoji" style="font-size:44px">${ch}</div><div class="name">${ch}</div>`; b.addEventListener('click', ()=> handleAnswer(ch===correct, b)); grid.appendChild(b); }); playContent.appendChild(grid);
+	const choiceBtns = playContent.querySelectorAll('.choice'); choiceBtns.forEach(b=> b.disabled = true);
+	playInstructionAudio(`Huruf ${correct}`).then(()=> choiceBtns.forEach(b=> b.disabled = false));
 }
 
 function questionAnimal(){ const animals = DATA.hewan; const idx = Math.floor(Math.random()*animals.length); const correctAnimal = animals[idx]; current = {type:'hewan', correct: correctAnimal}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih binatang: <div style="font-size:28px">${correctAnimal.name}</div></div>`; playContent.appendChild(prompt);
 	// options: pick correct animal and two others from array
 	const others = shuffle(animals.filter((_,i)=>i!==idx)).slice(0,2);
 	const opts = shuffle([correctAnimal, ...others]);
-	const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(a=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = a.name; if(a.name===correctAnimal.name) b.dataset.correct='true'; b.innerHTML=`<div class="emoji">${a.emoji}</div><div class="name">${a.name}</div>`; b.addEventListener('click', ()=> handleAnswer(a.name===correctAnimal.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Pilih binatang ${correctAnimal.name}`);
+	const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(a=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = a.name; if(a.name===correctAnimal.name) b.dataset.correct='true'; b.innerHTML=`<div class="emoji">${a.emoji}</div><div class="name">${a.name}</div>`; b.addEventListener('click', ()=> handleAnswer(a.name===correctAnimal.name, b)); grid.appendChild(b); }); playContent.appendChild(grid);
+	const choiceBtns = playContent.querySelectorAll('.choice'); choiceBtns.forEach(b=> b.disabled = true);
+	playInstructionAudio(`Pilih binatang ${correctAnimal.name}`).then(()=> choiceBtns.forEach(b=> b.disabled = false));
 }
 
 function questionColor(){ const items = DATA.warna; const correct = items[Math.floor(Math.random()*items.length)]; current={type:'warna', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih warna: <div style="font-size:28px">${correct.name}</div></div>`; playContent.appendChild(prompt);
 	// ensure correct included
 	const others = shuffle(items.filter(i=>i.name!==correct.name)).slice(0,2);
-	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(c=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = c.name; if(c.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${c.code}"></div><div class="name">${c.name}</div>`; b.addEventListener('click', ()=> handleAnswer(c.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Warna ${correct.name}`);
+	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(c=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = c.name; if(c.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="width:64px;height:64px;border-radius:12px;background:${c.code}"></div><div class="name">${c.name}</div>`; b.addEventListener('click', ()=> handleAnswer(c.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid);
+	const choiceBtns = playContent.querySelectorAll('.choice'); choiceBtns.forEach(b=> b.disabled = true);
+	playInstructionAudio(`Warna ${correct.name}`).then(()=> choiceBtns.forEach(b=> b.disabled = false));
 }
 
 function questionShape(){ const items = DATA.bentuk; const correct = items[Math.floor(Math.random()*items.length)]; current={type:'bentuk', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:24px;font-weight:800">Pilih bentuk: <div style="font-size:28px">${correct.name}</div></div>`; playContent.appendChild(prompt);
 	const others = shuffle(items.filter(i=>i.name!==correct.name)).slice(0,2);
-	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = s.name; if(s.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="font-size:44px">${s.emoji}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Bentuk ${correct.name}`);
+	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = s.name; if(s.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="font-size:44px">${s.emoji}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid);
+	const choiceBtns = playContent.querySelectorAll('.choice'); choiceBtns.forEach(b=> b.disabled = true);
+	playInstructionAudio(`Bentuk ${correct.name}`).then(()=> choiceBtns.forEach(b=> b.disabled = false));
 }
 
 function questionNumber(){ const items = DATA.angka; const correct = items[Math.floor(Math.random()*items.length)]; current={type:'angka', correct}; playContent.innerHTML=''; const prompt=document.createElement('div'); prompt.innerHTML=`<div style="font-size:28px;font-weight:800">Pilih angka: <div style="font-size:48px">${correct.num}</div></div>`; playContent.appendChild(prompt);
 	const others = shuffle(items.filter(i=>i.name!==correct.name)).slice(0,2);
-	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = s.name; if(s.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="font-size:44px">${s.num}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid); playInstructionAudio(`Angka ${correct.name}`);
+	const opts = shuffle([correct, ...others]); const grid=document.createElement('div'); grid.className='choice-grid'; opts.forEach(s=>{ const b=document.createElement('button'); b.className='choice'; b.dataset.value = s.name; if(s.name===correct.name) b.dataset.correct='true'; b.innerHTML=`<div style="font-size:44px">${s.num}</div><div class="name">${s.name}</div>`; b.addEventListener('click', ()=> handleAnswer(s.name===correct.name, b)); grid.appendChild(b); }); playContent.appendChild(grid);
+	const choiceBtns = playContent.querySelectorAll('.choice'); choiceBtns.forEach(b=> b.disabled = true);
+	playInstructionAudio(`Angka ${correct.name}`).then(()=> choiceBtns.forEach(b=> b.disabled = false));
 }
 
 async function handleAnswer(isCorrect, button){
@@ -166,25 +176,21 @@ async function handleAnswer(isCorrect, button){
 		if(button) button.classList.remove('correct');
 		nextQuestion();
 	} else {
-		score = Math.max(0, score-5); updateScore(); const toneP = playWrongAsync();
-		// tell the correct answer
-		let correctText = '';
-		if(current.type === 'huruf') correctText = current.correct;
-		else if(current.type === 'hewan') correctText = current.correct.name;
-		else if(current.type === 'warna') correctText = current.correct.name;
-		else if(current.type === 'bentuk') correctText = current.correct.name;
-		else if(current.type === 'angka') correctText = current.correct.name;
-		const speechP = playAudioElementAsync('wrong', `Salah. Jawabannya adalah ${correctText}`);
+		score = Math.max(0, score-5); updateScore();
+		const toneP = playWrongAsync();
+		const speechP = playAudioElementAsync('wrong', 'Salah. Coba lagi');
 
-		// visually indicate correct and wrong
-		const correctBtn = Array.from(choices).find(b=> b.dataset && b.dataset.correct === 'true');
-		if(correctBtn) correctBtn.classList.add('correct');
+		// visually indicate wrong on the clicked button
 		if(button) button.classList.add('wrong');
 
+		// wait until wrong tone and speech finish
 		await Promise.all([toneP, speechP]);
-		if(correctBtn) correctBtn.classList.remove('correct');
+
+		// clear visual wrong state
 		if(button) button.classList.remove('wrong');
-		nextQuestion();
+
+		// replay the instruction and allow answering again
+		await replayQuestion();
 	}
 }
 
@@ -216,6 +222,17 @@ function playInstructionAudio(fallbackText){ // returns a Promise that resolves 
 }
 
 function playAudioElementAsync(key, fallbackText){ if(audioElements[key]){ const a = audioElements[key]; try{ a.currentTime = 0; const p = a.play(); return new Promise(resolve=>{ a.addEventListener('ended', ()=> resolve(), {once:true}); p.catch(()=> speakAsync(fallbackText).then(resolve)); }); } catch(e){ return speakAsync(fallbackText); } } return speakAsync(fallbackText); }
+
+async function replayQuestion(){ const choices = playContent.querySelectorAll('.choice'); choices.forEach(b=> b.disabled = true); let instr = '';
+	if(!current) { choices.forEach(b=> b.disabled = false); return; }
+	if(current.type === 'huruf') instr = `Huruf ${current.correct}`;
+	else if(current.type === 'hewan') instr = `Pilih binatang ${current.correct.name}`;
+	else if(current.type === 'warna') instr = `Warna ${current.correct.name}`;
+	else if(current.type === 'bentuk') instr = `Bentuk ${current.correct.name}`;
+	else if(current.type === 'angka') instr = `Angka ${current.correct.name}`;
+	await playInstructionAudio(instr);
+	choices.forEach(b=> b.disabled = false);
+}
 
 // Update question routines to use playInstructionAudio where appropriate
 // (example: in questionAnimal we already call speak(); replace with playInstructionAudio to prefer uploaded audio)
