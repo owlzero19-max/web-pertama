@@ -1,8 +1,8 @@
 :root{
 	--bg:#fffaf2;
 	--card:#ffffff;
-	--accent:#ff7a59;
-	--accent-2:#ffd166;
+	--accent:#0084ff;
+	--accent-2:#00a7f5;
 	--muted:#6b6b6b;
 	--radius:14px;
 	--shadow: 0 8px 20px rgba(34,34,34,.08);
@@ -20,7 +20,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
 .hidden{display:none}
 .learn-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
-.card{background:linear-gradient(180deg,#fff,#fffef0);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid #ffd9c9;cursor:pointer}
+.card{background:linear-gradient(180deg,#fff,#b1e0ff);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid #003274;cursor:pointer}
 .card .big{font-size:56px}
 .card .label{font-weight:800}
 .game-controls{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -28,7 +28,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
 .btn.primary{background:var(--accent);color:white;padding:10px 14px;font-weight:700}
 .play-content{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
 .choice-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.choice{background:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.06);cursor:pointer;min-width:120px;text-align:center}
+.choice{background:#83dcff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.06);cursor:pointer;min-width:120px;text-align:center}
 .choice .emoji{font-size:48px}
 .choice.correct{outline:4px solid #28a745;background:linear-gradient(180deg,#e8fff0,#ffffff)}
 .choice.wrong{outline:4px solid #dc3545;opacity:.9;background:linear-gradient(180deg,#fff0f0,#ffffff)}

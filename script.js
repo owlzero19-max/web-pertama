@@ -12,10 +12,10 @@ const DATA = {
 		{name:'Zebra', emoji:'🦓'}
 	],
 	warna: [
-		{name:'Merah', code:'#ef476f'}, {name:'Kuning', code:'#ffd166'}, {name:'Biru', code:'#118ab2'},
-		{name:'Hijau', code:'#06d6a0'}, {name:'Ungu', code:'#9d4edd'}, {name:'Oranye', code:'#ff7a59'},
+		{name:'Merah', code:'#ff0000ff'}, {name:'Kuning', code:'#ffd900ff'}, {name:'Biru', code:'#0077ffff'},
+		{name:'Hijau', code:'#22ce00ff'}, {name:'Ungu', code:'#9729f1ff'}, {name:'Oranye', code:'#ff7300ff'},
 		{name:'Pink', code:'#ff6bcb'}, {name:'Cokelat', code:'#8d6e63'}, {name:'Abu-abu', code:'#6c757d'},
-		{name:'Hitam', code:'#343a40'}, {name:'Putih', code:'#ffffff'}
+		{name:'Hitam', code:'#000000ff'}, {name:'Putih', code:'#ffffff'}
 	],
 	bentuk: [
  		{name:'Lingkaran', shape:'circle', emoji:'⚫'}, {name:'Segitiga', shape:'triangle', emoji:'🔺'},
@@ -171,7 +171,7 @@ async function handleAnswer(isCorrect, button){
 	if(isCorrect){
 		score += 10; updateScore(); if(button) button.classList.add('correct');
 		const toneP = playCorrectAsync();
-		const speechP = (audioElements.correct ? playAudioElementAsync('correct','Benar!') : speakAsync('Benar!'));
+		const speechP = (audioElements.correct ? playAudioElementAsync('correct','Benar!') : speakAsync('Benar!, Kamu hebat!'));
 		await Promise.all([toneP, speechP]);
 		if(button) button.classList.remove('correct');
 		nextQuestion();
@@ -226,10 +226,10 @@ function playAudioElementAsync(key, fallbackText){ if(audioElements[key]){ const
 async function replayQuestion(){ const choices = playContent.querySelectorAll('.choice'); choices.forEach(b=> b.disabled = true); let instr = '';
 	if(!current) { choices.forEach(b=> b.disabled = false); return; }
 	if(current.type === 'huruf') instr = `Huruf ${current.correct}`;
-	else if(current.type === 'hewan') instr = `Pilih binatang ${current.correct.name}`;
-	else if(current.type === 'warna') instr = `Warna ${current.correct.name}`;
-	else if(current.type === 'bentuk') instr = `Bentuk ${current.correct.name}`;
-	else if(current.type === 'angka') instr = `Angka ${current.correct.name}`;
+	else if(current.type === 'hewan') instr = `Yang mana binatang ${current.correct.name}? `;
+	else if(current.type === 'warna') instr = ` Yang mana warna ${current.correct.name}? `;
+	else if(current.type === 'bentuk') instr = ` Yang mana bentuk ${current.correct.name}? `;
+	else if(current.type === 'angka') instr = ` Yang mana angka ${current.correct.name}? `;
 	await playInstructionAudio(instr);
 	choices.forEach(b=> b.disabled = false);
 }
